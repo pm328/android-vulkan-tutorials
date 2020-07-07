@@ -216,6 +216,7 @@ extern PFN_vkGetPhysicalDeviceMirPresentationSupportKHR vkGetPhysicalDeviceMirPr
 #ifdef VK_USE_PLATFORM_ANDROID_KHR
 // VK_KHR_android_surface
 extern PFN_vkCreateAndroidSurfaceKHR vkCreateAndroidSurfaceKHR;
+extern PFN_vkGetAndroidHardwareBufferPropertiesANDROID vkGetAndroidHardwareBufferPropertiesANDROID;
 #endif
 
 #ifdef VK_USE_PLATFORM_WIN32_KHR

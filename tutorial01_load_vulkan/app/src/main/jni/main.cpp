@@ -220,6 +220,9 @@ bool initialize(android_app* app) {
       bufferProperties.pNext = &bufferFormatProperties;
       AHardwareBuffer *hardwareBuffer;
       AHardwareBuffer_Desc desc{width, height, 1, hardwareBufferFormat, hardwareBufferUsage, 0, 0, 0};
+      int isSupported = AHardwareBuffer_isSupported(&desc);
+      assert(isSupported != 0);
+
       int error = AHardwareBuffer_allocate(&desc, &hardwareBuffer);
       if (error < 0) {
         LOGE("AHardwareBuffer_allocate error: %d", error);

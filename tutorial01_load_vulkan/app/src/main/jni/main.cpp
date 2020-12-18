@@ -89,6 +89,18 @@ bool initialize(android_app* app) {
   instanceExt.push_back("VK_KHR_android_surface");
   deviceExt.push_back("VK_KHR_swapchain");
 
+  deviceExt.push_back(VK_ANDROID_EXTERNAL_MEMORY_ANDROID_HARDWARE_BUFFER_EXTENSION_NAME);
+
+  // Hardware Buffer extension dependencies.
+  deviceExt.push_back(VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME);
+  deviceExt.push_back(VK_KHR_MAINTENANCE1_EXTENSION_NAME);
+  deviceExt.push_back(VK_KHR_BIND_MEMORY_2_EXTENSION_NAME);
+  deviceExt.push_back(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME);
+  deviceExt.push_back(VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME);
+  deviceExt.push_back(VK_EXT_QUEUE_FAMILY_FOREIGN_EXTENSION_NAME);
+  instanceExt.push_back(VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME);
+  instanceExt.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+
   // Create the Vulkan instance
   VkInstanceCreateInfo instanceCreateInfo{
       .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
@@ -196,6 +208,32 @@ bool initialize(android_app* app) {
   CALL_VK(
       vkCreateDevice(tutorialGpu, &deviceCreateInfo, nullptr, &tutorialDevice));
   initialized_ = true;
+
+  auto createHardwareBuffer = []() {
+      uint32_t width = 1024;
+      uint32_t height = 1024;
+      // uint32_t hardwareBufferFormat = AHARDWAREBUFFER_FORMAT_R8G8B8A8_UNORM;
+      uint32_t hardwareBufferFormat = AHARDWAREBUFFER_FORMAT_D16_UNORM;
+      uint32_t hardwareBufferUsage = AHARDWAREBUFFER_USAGE_GPU_SAMPLED_IMAGE | AHARDWAREBUFFER_USAGE_GPU_FRAMEBUFFER;
+      VkAndroidHardwareBufferFormatPropertiesANDROID bufferFormatProperties{VK_STRUCTURE_TYPE_ANDROID_HARDWARE_BUFFER_FORMAT_PROPERTIES_ANDROID};
+      VkAndroidHardwareBufferPropertiesANDROID bufferProperties{VK_STRUCTURE_TYPE_ANDROID_HARDWARE_BUFFER_PROPERTIES_ANDROID};
+      bufferProperties.pNext = &bufferFormatProperties;
+      AHardwareBuffer *hardwareBuffer;
+      AHardwareBuffer_Desc desc{width, height, 1, hardwareBufferFormat, hardwareBufferUsage, 0, 0, 0};
+      int isSupported = AHardwareBuffer_isSupported(&desc);
+      assert(isSupported != 0);
+
+      int error = AHardwareBuffer_allocate(&desc, &hardwareBuffer);
+      if (error < 0) {
+        LOGE("AHardwareBuffer_allocate error: %d", error);
+        return;
+      }
+
+      CALL_VK(vkGetAndroidHardwareBufferPropertiesANDROID(tutorialDevice, hardwareBuffer, &bufferProperties));
+      assert(bufferFormatProperties.format != VK_FORMAT_UNDEFINED);
+  };
+  createHardwareBuffer();
+
   return 0;
 }
 

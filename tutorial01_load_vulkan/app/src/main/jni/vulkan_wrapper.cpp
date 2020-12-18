@@ -199,6 +199,7 @@ int InitVulkan(void) {
 
 #ifdef VK_USE_PLATFORM_ANDROID_KHR
     vkCreateAndroidSurfaceKHR = reinterpret_cast<PFN_vkCreateAndroidSurfaceKHR>(dlsym(libvulkan, "vkCreateAndroidSurfaceKHR"));
+    vkGetAndroidHardwareBufferPropertiesANDROID = reinterpret_cast<PFN_vkGetAndroidHardwareBufferPropertiesANDROID>(dlsym(libvulkan, "vkGetAndroidHardwareBufferPropertiesANDROID"));
 #endif
 
 #ifdef VK_USE_PLATFORM_WIN32_KHR
@@ -392,6 +393,7 @@ PFN_vkGetPhysicalDeviceMirPresentationSupportKHR vkGetPhysicalDeviceMirPresentat
 
 #ifdef VK_USE_PLATFORM_ANDROID_KHR
 PFN_vkCreateAndroidSurfaceKHR vkCreateAndroidSurfaceKHR;
+PFN_vkGetAndroidHardwareBufferPropertiesANDROID vkGetAndroidHardwareBufferPropertiesANDROID;
 #endif
 
 #ifdef VK_USE_PLATFORM_WIN32_KHR
